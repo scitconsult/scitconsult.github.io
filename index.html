@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IVNABIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #e8e4dc;
+    --paper: #e2ddd4;
+    --gold: #c9a84c;
+    --gold-light: #e8d5a3;
+    --rust: #8b3a2a;
+    --slate: #a8b0b8;
+    --cream: #0d1117;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: linear-gradient(160deg, #0d1117 0%, #0a1628 30%, #0d1f2d 60%, #0a0f1a 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* CURSOR */
+  body { cursor: none; }
+  .cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid var(--gold); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease-out, width 0.3s, height 0.3s, border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+  .cursor-ring.hover-gold {
+    border-color: var(--gold-light);
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.16) 0%, rgba(201, 168, 76, 0.08) 50%, rgba(201, 168, 76, 0) 80%);
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.55);
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 3rem;
+    background: rgba(10, 16, 28, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; letter-spacing: 0.15em;
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--slate); text-decoration: none;
+    position: relative; padding-bottom: 2px;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 1px; background: var(--gold);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 8rem 3rem 4rem 3rem;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute; top: 50%; right: -2rem;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(10rem, 22vw, 22rem);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(201, 168, 76, 0.12);
+    letter-spacing: 0.05em;
+    user-select: none; pointer-events: none;
+    white-space: nowrap;
+  }
+  .hero-tag {
+    font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1.2rem;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 13rem);
+    line-height: 0.88; letter-spacing: 0.03em;
+    color: var(--paper);
+    opacity: 0; animation: fadeUp 0.9s 0.4s forwards;
+  }
+  .hero-title span { color: var(--gold); }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+    color: var(--slate); margin-top: 1.5rem; max-width: 480px;
+    opacity: 0; animation: fadeUp 0.9s 0.6s forwards;
+  }
+  .hero-cta {
+    margin-top: 2.5rem; display: flex; gap: 1.2rem; align-items: center;
+    opacity: 0; animation: fadeUp 0.9s 0.8s forwards;
+  }
+  .btn-primary {
+    padding: 0.85rem 2.2rem;
+    background: var(--gold); color: #0a0f1a;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    border: none; text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .btn-ghost {
+    padding: 0.85rem 2.2rem;
+    background: transparent; color: var(--paper);
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    border: 1px solid rgba(232,212,163,0.4); text-decoration: none;
+    transition: border-color 0.3s, color 0.3s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+  .hero-scroll {
+    position: absolute; bottom: 2.5rem; left: 3rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--slate);
+    opacity: 0; animation: fadeUp 1s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px; background: var(--gold);
+    animation: expandLine 1.2s 1.4s both;
+  }
+  .hero-grid-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  /* ABOUT */
+  #about {
+    padding: 7rem 3rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .about-img-wrap {
+    position: relative;
+  }
+  .about-img-frame {
+    width: 100%; aspect-ratio: 3/4;
+    background: linear-gradient(135deg, #1a2a3a, #0d1f2d);
+    position: relative; overflow: hidden;
+  }
+  .about-img-frame::before {
+    content: 'IVNABIN'; position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem; color: rgba(255,255,255,0.12);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    letter-spacing: 0.1em; white-space: nowrap;
+  }
+  .about-img-border {
+    position: absolute; top: 1.2rem; left: 1.2rem;
+    right: -1.2rem; bottom: -1.2rem;
+    border: 1px solid var(--gold); z-index: -1;
+  }
+  .about-label {
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .about-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300; line-height: 1.15; margin-bottom: 1.5rem;
+    color: var(--paper);
+  }
+  .about-heading em { font-style: italic; color: var(--gold); }
+  .about-text {
+    font-size: 0.95rem; line-height: 1.85; color: var(--slate);
+    margin-bottom: 1rem;
+  }
+  .about-stats {
+    display: flex; gap: 2rem; margin-top: 2rem; padding-top: 2rem;
+    border-top: 1px solid rgba(201,168,76,0.25);
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem; color: var(--gold); line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--slate); margin-top: 0.2rem;
+  }
+
+  /* SERVICES */
+  #services {
+    background: rgba(10, 22, 40, 0.7); padding: 7rem 3rem;
+  }
+  .services-inner { max-width: 1200px; margin: 0 auto; }
+  .section-header { text-align: center; margin-bottom: 4rem; }
+  .section-label {
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: 0.05em;
+    color: var(--paper);
+  }
+  .services-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .service-card {
+    padding: 2.5rem; border-right: 1px solid rgba(201,168,76,0.2);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    position: relative; overflow: hidden;
+    transition: background 0.4s;
+  }
+  .service-card:nth-child(3n) { border-right: none; }
+  .service-card:nth-last-child(-n+3) { border-bottom: none; }
+  .service-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.06), transparent);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .service-card:hover::before { opacity: 1; }
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; color: rgba(201,168,76,0.15);
+    line-height: 1; margin-bottom: 1rem;
+    transition: color 0.4s;
+  }
+  .service-card:hover .service-num { color: rgba(201,168,76,0.35); }
+  .service-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; color: var(--paper);
+    margin-bottom: 0.8rem;
+  }
+  .service-desc {
+    font-size: 0.85rem; line-height: 1.75;
+    color: rgba(245,240,232,0.5);
+  }
+
+  /* PORTFOLIO */
+  #portfolio { padding: 7rem 3rem; }
+  .portfolio-inner { max-width: 1200px; margin: 0 auto; }
+  .portfolio-grid {
+    display: grid; grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 1.2rem; margin-top: 3rem;
+  }
+  .port-item {
+    overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #d4c5a9, #a8956a);
+    aspect-ratio: auto;
+  }
+  .port-item:nth-child(1) { grid-column: span 7; aspect-ratio: 16/9; }
+  .port-item:nth-child(2) { grid-column: span 5; aspect-ratio: 4/3; }
+  .port-item:nth-child(3) { grid-column: span 5; aspect-ratio: 4/3; }
+  .port-item:nth-child(4) { grid-column: span 7; aspect-ratio: 16/9; }
+  .port-item::before {
+    content: attr(data-title);
+    position: absolute; inset: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; color: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.1em;
+  }
+  .port-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,10,10,0.85), transparent 50%);
+    opacity: 0; transition: opacity 0.4s;
+    display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 1.8rem;
+  }
+  .port-item:hover .port-overlay { opacity: 1; }
+  .port-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; color: white; margin-bottom: 0.3rem;
+  }
+  .port-cat {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold);
+  }
+  .port-item:nth-child(1) { background: linear-gradient(135deg, #c4b5a0, #8a7560); }
+  .port-item:nth-child(2) { background: linear-gradient(135deg, #a8b5c4, #607080); }
+  .port-item:nth-child(3) { background: linear-gradient(135deg, #c4a8a8, #805050); }
+  .port-item:nth-child(4) { background: linear-gradient(135deg, #a8c4b5, #508060); }
+
+  /* TESTIMONIALS */
+  #testimonials { background: rgba(13, 31, 45, 0.6); padding: 7rem 3rem; }
+  .testimonials-inner { max-width: 1000px; margin: 0 auto; }
+  .testimonials-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
+  }
+  .testimonial-card {
+    padding: 2.5rem; background: rgba(15, 28, 45, 0.9);
+    border-left: 3px solid var(--gold);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .quote-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem; color: var(--gold);
+    line-height: 0.5; margin-bottom: 1rem;
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.05rem; line-height: 1.75;
+    color: rgba(226, 221, 212, 0.8); margin-bottom: 1.5rem;
+  }
+  .quote-author { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .quote-role { font-size: 0.72rem; color: var(--gold); margin-top: 0.2rem; }
+
+  /* CONTACT */
+  #contact {
+    background: rgba(8, 14, 26, 0.95); padding: 7rem 3rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  #contact::before {
+    content: 'IVNABIN'; position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(8rem, 20vw, 18rem);
+    color: transparent; -webkit-text-stroke: 1px rgba(201,168,76,0.06);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    letter-spacing: 0.1em; white-space: nowrap; pointer-events: none;
+  }
+  .contact-inner { max-width: 700px; margin: 0 auto; position: relative; z-index: 1; }
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 7vw, 6rem);
+    color: var(--paper); letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+  .contact-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.2rem;
+    color: rgba(245,240,232,0.6); margin-bottom: 2.5rem;
+  }
+  .contact-email {
+    display: inline-block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    letter-spacing: 0.08em; color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(201,168,76,0.4);
+    padding-bottom: 4px; margin-bottom: 3rem;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .contact-email:hover { color: var(--paper); border-color: var(--paper); }
+  .contact-socials { display: flex; justify-content: center; gap: 1.5rem; }
+  .social-link {
+    width: 44px; height: 44px; border: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(245,240,232,0.5); text-decoration: none;
+    font-size: 0.65rem; letter-spacing: 0.1em;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .social-link:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* FOOTER */
+  footer {
+    background: #050505; padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem; letter-spacing: 0.15em; color: var(--gold);
+  }
+  .footer-copy {
+    font-size: 0.72rem; color: rgba(245,240,232,0.3); letter-spacing: 0.08em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes expandLine {
+    from { width: 0; } to { width: 40px; }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    #about { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .service-card:nth-child(2n) { border-right: none; }
+    .service-card:nth-child(3n) { border-right: 1px solid rgba(201,168,76,0.2); }
+    .portfolio-grid { grid-template-columns: 1fr 1fr; }
+    .port-item:nth-child(n) { grid-column: span 1; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    nav {
+      padding: 1rem 1rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1rem;
+      width: 100%;
+    }
+    .nav-links a {
+      font-size: 0.63rem;
+      letter-spacing: 0.07em;
+    }
+    #hero, #about, #services, #portfolio, #testimonials, #contact { padding-left: 1.5rem; padding-right: 1.5rem; }
+    #hero { padding-top: 8.3rem; }
+    .services-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+  @media (max-width: 380px) {
+    .nav-links {
+      gap: 0.5rem 0.7rem;
+    }
+    .nav-links a {
+      font-size: 0.58rem;
+      letter-spacing: 0.04em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">IVNABIN</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="service.html">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-bg-text">IVNABIN</div>
+  <div class="hero-tag">Crafting Excellence Since 2020</div>
+  <h1 class="hero-title"><span>IVN</span>ABIN</h1>
+  <p class="hero-sub">Where vision meets execution — crafting experiences that leave a lasting mark on the world.</p>
+  <div class="hero-cta">
+    <a href="#portfolio" target="_blank" class="btn-primary">View Portfolio</a>
+    <a href="#contact" class="btn-ghost">Get In Touch</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-img-wrap reveal">
+    <div class="about-img-frame"></div>
+    <div class="about-img-border"></div>
+  </div>
+  <div class="reveal">
+    <div class="about-label">Our Story</div>
+    <h2 class="about-heading">We don't just build —<br>we <em>create legacies</em></h2>
+    <p class="about-text">IVNABIN was born from a relentless pursuit of excellence. We believe that every project carries within it the seed of something extraordinary — and our mission is to help it bloom.</p>
+    <p class="about-text">From concept to completion, we weave precision, passion, and purpose into everything we touch. Our team of specialists brings decades of combined expertise to every challenge.</p>
+    <div class="about-stats">
+      <div>
+        <div class="stat-num">5+</div>
+        <div class="stat-label">Years Active</div>
+      </div>
+      <div>
+        <div class="stat-num">200+</div>
+        <div class="stat-label">Projects Delivered</div>
+      </div>
+      <div>
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Client Satisfaction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-inner">
+    <div class="section-header reveal">
+      <div class="section-label">What We Do</div>
+      <h2 class="section-title">Our Services</h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-num">01</div>
+        <div class="service-name">Brand Strategy</div>
+        <p class="service-desc">We shape identities that resonate — from brand architecture to visual systems that speak with unmistakable clarity.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">02</div>
+        <div class="service-name">Digital Design</div>
+        <p class="service-desc">Interfaces that don't just function, but captivate. We craft digital experiences rooted in beauty and usability.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">03</div>
+        <div class="service-name">Web Development</div>
+        <p class="service-desc">Engineering the backbone of your digital presence with clean code, robust architecture, and flawless performance.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">04</div>
+        <div class="service-name">Content Creation</div>
+        <p class="service-desc">Storytelling that moves people — written, visual, and multimedia content that builds lasting connections.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">05</div>
+        <div class="service-name">Consulting</div>
+        <p class="service-desc">Strategic guidance drawn from real experience. We sit at the table with you, not just above it.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">06</div>
+        <div class="service-name">Growth Marketing</div>
+        <p class="service-desc">Data-driven campaigns that amplify reach without sacrificing soul. Growth with intention.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio">
+  <div class="portfolio-inner">
+    <div class="section-header reveal">
+      <div class="section-label" style="color:var(--gold)">Selected Work</div>
+      <h2 class="section-title" style="color:var(--ink)">Portfolio</h2>
+    </div>
+    <div class="portfolio-grid">
+      <div class="port-item reveal" data-title="OPUS">
+        <div class="port-overlay">
+          <div class="port-title">Opus Rebrand</div>
+          <div class="port-cat">Brand Identity · 2024</div>
+        </div>
+      </div>
+      <div class="port-item reveal" data-title="FLUX">
+        <div class="port-overlay">
+          <div class="port-title">Flux Platform</div>
+          <div class="port-cat">Web Design · 2024</div>
+        </div>
+      </div>
+      <div class="port-item reveal" data-title="VEIL">
+        <div class="port-overlay">
+          <div class="port-title">Veil Campaign</div>
+          <div class="port-cat">Marketing · 2023</div>
+        </div>
+      </div>
+      <div class="port-item reveal" data-title="NOVA">
+        <div class="port-overlay">
+          <div class="port-title">Nova Digital</div>
+          <div class="port-cat">Development · 2023</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testimonials-inner">
+    <div class="section-header reveal">
+      <div class="section-label">Voices</div>
+      <h2 class="section-title" style="color:var(--ink)">What Clients Say</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">&ldquo;</div>
+        <p class="quote-text">IVNABIN transformed our entire digital presence. The attention to detail, the depth of understanding — we felt truly seen as a brand.</p>
+        <div class="quote-author">Amara Okonkwo</div>
+        <div class="quote-role">CEO, Luminary Group</div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">&ldquo;</div>
+        <p class="quote-text">There is a rare kind of team that listens before they speak. IVNABIN is that team. The results exceeded every expectation we had.</p>
+        <div class="quote-author">Seun Adeyemi</div>
+        <div class="quote-role">Founder, Prism Labs</div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">&ldquo;</div>
+        <p class="quote-text">Working with IVNABIN felt like a partnership, not a transaction. They cared about our success as much as we did.</p>
+        <div class="quote-author">Chioma Eze</div>
+        <div class="quote-role">Director, Aether Studios</div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">&ldquo;</div>
+        <p class="quote-text">The strategy they developed positioned us perfectly in a competitive market. Six months later, revenue is up 40%. Speak for itself.</p>
+        <div class="quote-author">Tunde Balogun</div>
+        <div class="quote-role">CMO, Nexus Africa</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label reveal" style="color:var(--gold)">Get In Touch</div>
+    <h2 class="contact-title reveal">Let's Create<br>Something Great</h2>
+    <p class="contact-sub reveal">Ready to begin? We'd love to hear from you.</p>
+    <a href="mailto:joshuakehindechrist@gmail.com" class="contact-email reveal">joshuakehindechrist@gmail.com</a>
+    <div class="contact-socials reveal">
+      <a href="#" class="social-link">IG</a>
+      <a href="#" class="social-link">TW</a>
+      <a href="#" class="social-link">LI</a>
+      <a href="#" class="social-link">BE</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">IVNABIN</div>
+  <div class="footer-copy">&copy; 2025 IVNABIN. All rights reserved.</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width = '54px'; ring.style.height = '54px';
+      ring.classList.add('hover-gold');
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px'; ring.style.height = '36px';
+      ring.classList.remove('hover-gold');
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Parallax on hero bg text
+  const bgText = document.querySelector('.hero-bg-text');
+  window.addEventListener('scroll', () => {
+    bgText.style.transform = `translateY(calc(-50% + ${window.scrollY * 0.3}px))`;
+  });
+</script>
+</body>
+</html>
